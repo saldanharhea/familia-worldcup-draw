@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚽ Family World Cup Draw 2026</title>
+<style>
+  :root {
+    --gold: #FFD700;
+    --dark-gold: #B8860B;
+    --green: #00A86B;
+    --dark-green: #006644;
+    --red: #C0392B;
+    --blue: #1A3A5C;
+    --light-blue: #2980B9;
+    --bg: #0D1B2A;
+    --card: #162436;
+    --card2: #1E3248;
+    --text: #E8F4F8;
+    --muted: #8BA4B8;
+    --border: #2A4A6A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    background: linear-gradient(135deg, var(--dark-green) 0%, var(--blue) 100%);
+    padding: 20px 24px;
+    border-bottom: 3px solid var(--gold);
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 1.6rem; color: var(--gold); letter-spacing: 1px; }
+  header p { color: var(--muted); font-size: .85rem; }
+  nav {
+    background: var(--card);
+    display: flex; gap: 4px; padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  nav button {
+    background: transparent; border: none; color: var(--muted);
+    padding: 8px 16px; border-radius: 6px; cursor: pointer;
+    font-size: .9rem; white-space: nowrap; transition: all .2s;
+  }
+  nav button.active, nav button:hover {
+    background: var(--blue); color: var(--gold);
+  }
+  main { padding: 20px; max-width: 1100px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+  h2 { color: var(--gold); margin-bottom: 16px; font-size: 1.3rem; }
+  h3 { color: var(--light-blue); margin-bottom: 12px; font-size: 1rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; margin-bottom: 16px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+  @media(max-width:700px){ .grid-2,.grid-3{ grid-template-columns:1fr; } }
+  table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+  th { background: var(--blue); color: var(--gold); padding: 10px 12px; text-align: left; }
+  td { padding: 9px 12px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: rgba(255,255,255,.03); }
+  tr:hover td { background: rgba(41,128,185,.1); }
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: .75rem; font-weight: 600;
+  }
+  .badge-a { background: #1a4a1a; color: #4caf50; border: 1px solid #4caf50; }
+  .badge-b { background: #4a1a1a; color: #ef9a9a; border: 1px solid #ef5350; }
+  .badge-win { background: #1a4a1a; color: #66bb6a; }
+  .badge-draw { background: #3a3a1a; color: #ffd54f; }
+  .badge-loss { background: #4a1a1a; color: #ef9a9a; }
+  .badge-today { background: #1a3a4a; color: var(--gold); border: 1px solid var(--gold); }
+  .btn {
+    display: inline-block; padding: 9px 20px; border-radius: 6px;
+    border: none; cursor: pointer; font-size: .9rem; font-weight: 600;
+    transition: all .2s; text-transform: uppercase; letter-spacing: .5px;
+  }
+  .btn-primary { background: var(--green); color: #fff; }
+  .btn-primary:hover { background: var(--dark-green); }
+  .btn-danger { background: var(--red); color: #fff; }
+  .btn-gold { background: var(--gold); color: var(--bg); }
+  .btn-sm { padding: 5px 12px; font-size: .8rem; }
+  input, select {
+    background: var(--card2); border: 1px solid var(--border);
+    color: var(--text); padding: 8px 12px; border-radius: 6px;
+    width: 100%; font-size: .9rem; outline: none;
+  }
+  input:focus, select:focus { border-color: var(--light-blue); }
+  label { display: block; color: var(--muted); font-size: .8rem; margin-bottom: 4px; }
+  .form-group { margin-bottom: 14px; }
+  .tag {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: .78rem; font-weight: 600; margin: 2px;
+  }
+  .tag-a { background: rgba(76,175,80,.15); color: #81c784; border: 1px solid rgba(76,175,80,.4); }
+  .tag-b { background: rgba(239,83,80,.15); color: #ef9a9a; border: 1px solid rgba(239,83,80,.4); }
+  .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+  .alert-info { background: rgba(41,128,185,.2); border: 1px solid #2980b9; color: #90caf9; }
+  .alert-success { background: rgba(76,175,80,.2); border: 1px solid #4caf50; color: #a5d6a7; }
+  .alert-warning { background: rgba(255,193,7,.15); border: 1px solid #ffc107; color: #ffe082; }
+  .flag { font-size: 1.2rem; }
+  .member-card {
+    background: var(--card2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 14px; position: relative;
+  }
+  .member-card .name { font-weight: 700; font-size: 1rem; color: var(--text); }
+  .member-card .phone { font-size: .8rem; color: var(--muted); margin: 2px 0 8px; }
+  .member-card .teams { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pts-badge {
+    position: absolute; top: 12px; right: 12px;
+    background: var(--blue); color: var(--gold);
+    border-radius: 20px; padding: 3px 10px; font-weight: 700; font-size: .9rem;
+  }
+  .rank { font-size: 1.2rem; font-weight: 700; color: var(--gold); width: 30px; }
+  .rank-1 { color: #FFD700; }
+  .rank-2 { color: #C0C0C0; }
+  .rank-3 { color: #CD7F32; }
+  .score-input { width: 50px; text-align: center; }
+  .match-row td { vertical-align: middle; }
+  .vs { color: var(--muted); font-size: .8rem; text-align: center; }
+  .highlight-row td { background: rgba(255,215,0,.06) !important; }
+  .trophy { font-size: 2rem; }
+  .stat-box {
+    text-align: center; padding: 16px;
+    background: var(--card2); border-radius: 8px; border: 1px solid var(--border);
+  }
+  .stat-box .num { font-size: 2rem; font-weight: 700; color: var(--gold); }
+  .stat-box .lbl { font-size: .8rem; color: var(--muted); margin-top: 4px; }
+  #toast {
+    position: fixed; bottom: 24px; right: 24px; z-index: 999;
+    background: var(--green); color: #fff; padding: 12px 20px;
+    border-radius: 8px; font-size: .9rem; font-weight: 600;
+    opacity: 0; transition: opacity .3s; pointer-events: none;
+  }
+  .today-badge {
+    background: linear-gradient(90deg, var(--gold), #FFA500);
+    color: var(--bg); padding: 2px 10px; border-radius: 20px;
+    font-size: .75rem; font-weight: 700; margin-left: 8px;
+  }
+  .match-team { font-weight: 600; }
+  .involved { color: var(--gold) !important; }
+  .tabs { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); cursor: pointer; font-size: .85rem;
+  }
+  .tab-btn.active { background: var(--blue); color: var(--gold); border-color: var(--blue); }
+  .group-header {
+    background: linear-gradient(90deg, var(--blue), var(--dark-green));
+    padding: 8px 14px; border-radius: 6px; margin: 16px 0 8px;
+    font-weight: 700; color: var(--gold); font-size: .9rem;
+  }
+  .notification-list { max-height: 400px; overflow-y: auto; }
+  .notif-item {
+    padding: 10px 14px; border-bottom: 1px solid var(--border);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .notif-icon { font-size: 1.2rem; }
+  .notif-text { font-size: .85rem; }
+  .notif-time { font-size: .75rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <div>⚽</div>
+  <div>
+    <h1>Family World Cup Draw 2026</h1>
+    <p id="headerDate">FIFA World Cup 2026 — USA · Canada · Mexico</p>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showSection('dashboard')">🏠 Dashboard</button>
+  <button onclick="showSection('members')">👨‍👩‍👧‍👦 Members</button>
+  <button onclick="showSection('draw')">🎲 Draw</button>
+  <button onclick="showSection('teams')">🌍 Teams</button>
+  <button onclick="showSection('fixtures')">📅 Fixtures</button>
+  <button onclick="showSection('results')">⚽ Results</button>
+  <button onclick="showSection('leaderboard')">🏆 Leaderboard</button>
+  <button onclick="showSection('notifications')">🔔 Notifications</button>
+</nav>
+
+<main>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="section active">
+  <h2>🏠 Dashboard</h2>
+  <div id="dashStats" class="grid-3" style="margin-bottom:20px;"></div>
+  <div class="grid-2">
+    <div>
+      <div class="card">
+        <h3>📅 Today's Matches</h3>
+        <div id="dashToday"></div>
+      </div>
+      <div class="card">
+        <h3>🏆 Top 5 Leaderboard</h3>
+        <div id="dashLeader"></div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>🔔 Recent Notifications</h3>
+        <div id="dashNotif"></div>
+      </div>
+      <div class="card">
+        <h3>Quick Actions</h3>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+          <button class="btn btn-primary" onclick="showSection('results')">Enter Results</button>
+          <button class="btn btn-gold" onclick="showSection('leaderboard')">View Leaderboard</button>
+          <button class="btn btn-sm" style="background:var(--blue);color:#fff;" onclick="showSection('draw')">Re-Run Draw</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MEMBERS -->
+<div id="members" class="section">
+  <h2>👨‍👩‍👧‍👦 Family Members</h2>
+  <div class="card" id="memberForm">
+    <h3>Add / Edit Member</h3>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Name</label>
+        <select id="memberNameSel">
+          <option value="">-- Select Member --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="memberPhone" placeholder="+1 234 567 8900">
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveMember()">Save Member</button>
+  </div>
+  <div class="card">
+    <h3>Registered Members (<span id="memberCount">0</span>/18)</h3>
+    <div id="memberGrid" class="grid-3"></div>
+  </div>
+</div>
+
+<!-- DRAW -->
+<div id="draw" class="section">
+  <h2>🎲 Team Draw</h2>
+  <div class="alert alert-info">
+    Each member receives <strong>1 Category A</strong> (strong) team + <strong>1 Category B</strong> (weaker) team via random draw.
+  </div>
+  <div class="card">
+    <h3>Draw Status</h3>
+    <div id="drawStatus"></div>
+    <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+      <button class="btn btn-gold" onclick="runDraw()">🎲 Run Draw</button>
+      <button class="btn btn-danger btn-sm" onclick="clearDraw()">Clear Draw</button>
+    </div>
+  </div>
+  <div id="drawResults" class="card" style="display:none;">
+    <h3>Draw Results</h3>
+    <table>
+      <thead><tr><th>#</th><th>Member</th><th>Phone</th><th>Cat A Team</th><th>Cat B Team</th></tr></thead>
+      <tbody id="drawTable"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TEAMS -->
+<div id="teams" class="section">
+  <h2>🌍 World Cup 2026 Teams</h2>
+  <div class="grid-2" style="margin-bottom:16px;">
+    <div class="stat-box">
+      <div class="num">24</div>
+      <div class="lbl">⭐ Category A — Strong Teams</div>
+    </div>
+    <div class="stat-box">
+      <div class="num">24</div>
+      <div class="lbl">Category B — Weaker Teams</div>
+    </div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>⭐ Category A — Strong Favorites</h3>
+      <div id="teamListA"></div>
+    </div>
+    <div class="card">
+      <h3>Category B — Underdogs</h3>
+      <div id="teamListB"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FIXTURES -->
+<div id="fixtures" class="section">
+  <h2>📅 Match Fixtures</h2>
+  <div class="tabs" id="fixtureTabs"></div>
+  <div class="alert alert-warning" id="fixAlert" style="display:none;"></div>
+  <div id="fixtureContent"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results" class="section">
+  <h2>⚽ Enter Match Results</h2>
+  <div class="alert alert-info">Enter scores to update the points table and leaderboard automatically.</div>
+  <div class="card">
+    <div class="form-group">
+      <label>Filter by Group</label>
+      <select id="resultGroupFilter" onchange="renderResults()">
+        <option value="">All Groups</option>
+      </select>
+    </div>
+  </div>
+  <div id="resultsList"></div>
+</div>
+
+<!-- LEADERBOARD -->
+<div id="leaderboard" class="section">
+  <h2>🏆 Family Leaderboard</h2>
+  <div class="card">
+    <div id="leaderboardTable"></div>
+  </div>
+  <div class="card" style="margin-top:16px;">
+    <h3>Full Points Breakdown</h3>
+    <div id="pointsBreakdown"></div>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div id="notifications" class="section">
+  <h2>🔔 Notifications</h2>
+  <div class="alert alert-warning">
+    <strong>SMS Integration:</strong> To enable real SMS notifications, configure a Twilio account and set your credentials below. Without this, notifications are logged here only.
+  </div>
+  <div class="card">
+    <h3>SMS Settings (Twilio)</h3>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Account SID</label>
+        <input type="text" id="twilioSID" placeholder="ACxxxxxxxxxxxxxxxx">
+      </div>
+      <div class="form-group">
+        <label>Auth Token</label>
+        <input type="password" id="twilioToken" placeholder="Your auth token">
+      </div>
+      <div class="form-group">
+        <label>From Number</label>
+        <input type="text" id="twilioFrom" placeholder="+1 555 000 0000">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="saveTwilio()">Save Settings</button>
+  </div>
+  <div class="card">
+    <h3>Send Today's Match Alert</h3>
+    <button class="btn btn-gold" onclick="sendTodayAlert()">📲 Send Match Day Notification to All Members</button>
+  </div>
+  <div class="card">
+    <h3>Notification Log</h3>
+    <div class="notification-list" id="notifLog"></div>
+  </div>
+</div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// =====================================================================
+// DATA
+// =====================================================================
+
+const FAMILY_NAMES = [
+  'Flora','Sherica','Ethan','Nigel','Rhea','Hazel','Jealife','Shannon',
+  'Glinda','Sherwyn','Domnic','Rachel','Rosch','Terry','Raggie',
+  'Rattin','Joscelyn','Roel'
+];
+
+const TEAMS = {
+  A: [
+    {name:'Argentina',flag:'🇦🇷',conf:'CONMEBOL'},
+    {name:'France',flag:'🇫🇷',conf:'UEFA'},
+    {name:'Brazil',flag:'🇧🇷',conf:'CONMEBOL'},
+    {name:'England',flag:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',conf:'UEFA'},
+    {name:'Spain',flag:'🇪🇸',conf:'UEFA'},
+    {name:'Portugal',flag:'🇵🇹',conf:'UEFA'},
+    {name:'Germany',flag:'🇩🇪',conf:'UEFA'},
+    {name:'Netherlands',flag:'🇳🇱',conf:'UEFA'},
+    {name:'Belgium',flag:'🇧🇪',conf:'UEFA'},
+    {name:'Uruguay',flag:'🇺🇾',conf:'CONMEBOL'},
+    {name:'Colombia',flag:'🇨🇴',conf:'CONMEBOL'},
+    {name:'Mexico',flag:'🇲🇽',conf:'CONCACAF'},
+    {name:'USA',flag:'🇺🇸',conf:'CONCACAF'},
+    {name:'Morocco',flag:'🇲🇦',conf:'CAF'},
+    {name:'Japan',flag:'🇯🇵',conf:'AFC'},
+    {name:'Croatia',flag:'🇭🇷',conf:'UEFA'},
+    {name:'Senegal',flag:'🇸🇳',conf:'CAF'},
+    {name:'Denmark',flag:'🇩🇰',conf:'UEFA'},
+    {name:'Switzerland',flag:'🇨🇭',conf:'UEFA'},
+    {name:'South Korea',flag:'🇰🇷',conf:'AFC'},
+    {name:'Ecuador',flag:'🇪🇨',conf:'CONMEBOL'},
+    {name:'Turkey',flag:'🇹🇷',conf:'UEFA'},
+    {name:'Serbia',flag:'🇷🇸',conf:'UEFA'},
+    {name:'Austria',flag:'🇦🇹',conf:'UEFA'},
+  ],
+  B: [
+    {name:'Canada',flag:'🇨🇦',conf:'CONCACAF'},
+    {name:'Poland',flag:'🇵🇱',conf:'UEFA'},
+    {name:'Iran',flag:'🇮🇷',conf:'AFC'},
+    {name:'Saudi Arabia',flag:'🇸🇦',conf:'AFC'},
+    {name:'Ghana',flag:'🇬🇭',conf:'CAF'},
+    {name:'Cameroon',flag:'🇨🇲',conf:'CAF'},
+    {name:'Ivory Coast',flag:'🇨🇮',conf:'CAF'},
+    {name:'Nigeria',flag:'🇳🇬',conf:'CAF'},
+    {name:'Algeria',flag:'🇩🇿',conf:'CAF'},
+    {name:'Egypt',flag:'🇪🇬',conf:'CAF'},
+    {name:'Tunisia',flag:'🇹🇳',conf:'CAF'},
+    {name:'Costa Rica',flag:'🇨🇷',conf:'CONCACAF'},
+    {name:'Honduras',flag:'🇭🇳',conf:'CONCACAF'},
+    {name:'Panama',flag:'🇵🇦',conf:'CONCACAF'},
+    {name:'Paraguay',flag:'🇵🇾',conf:'CONMEBOL'},
+    {name:'Bolivia',flag:'🇧🇴',conf:'CONMEBOL'},
+    {name:'Venezuela',flag:'🇻🇪',conf:'CONMEBOL'},
+    {name:'Peru',flag:'🇵🇪',conf:'CONMEBOL'},
+    {name:'New Zealand',flag:'🇳🇿',conf:'OFC'},
+    {name:'Qatar',flag:'🇶🇦',conf:'AFC'},
+    {name:'Iraq',flag:'🇮🇶',conf:'AFC'},
+    {name:'South Africa',flag:'🇿🇦',conf:'CAF'},
+    {name:'Jamaica',flag:'🇯🇲',conf:'CONCACAF'},
+    {name:'Australia',flag:'🇦🇺',conf:'AFC'},
+  ]
+};
+
+// Group stage fixtures — 2026 WC (12 groups × 6 matches = 72 matches)
+// Simplified representative schedule; dates approximate
+const GROUPS = {
+  'A': ['USA','Bolivia','Panama','Serbia'],
+  'B': ['Morocco','Spain','Portugal','Egypt'],
+  'C': ['Argentina','Jamaica','Ecuador','Poland'],
+  'D': ['France','Ivory Coast','Tunisia','Mexico'],
+  'E': ['Germany','Switzerland','Belgium','Senegal'],
+  'F': ['Brazil','Algeria','Venezuela','Denmark'],
+  'G': ['England','South Africa','Australia','Netherlands'],
+  'H': ['Croatia','Colombia','Paraguay','Uruguay'],
+  'I': ['Japan','Turkey','Iran','South Korea'],
+  'J': ['Canada','Costa Rica','Peru','Austria'],
+  'K': ['Cameroon','Qatar','Ghana','Honduras'],
+  'L': ['Nigeria','Saudi Arabia','Iraq','New Zealand'],
+};
+
+// Generate round-robin fixtures per group
+function genGroupFixtures(group, teams, baseDate, matchNum) {
+  const pairs = [];
+  const d = new Date(baseDate);
+  for (let i = 0; i < teams.length; i++) {
+    for (let j = i+1; j < teams.length; j++) {
+      pairs.push({
+        id: `g${group}${i}${j}`,
+        group,
+        home: teams[i],
+        away: teams[j],
+        date: new Date(d).toISOString().split('T')[0],
+        homeScore: null,
+        awayScore: null,
+      });
+      d.setDate(d.getDate() + 1);
+    }
+  }
+  return pairs;
+}
+
+let ALL_FIXTURES = [];
+
+function initFixtures() {
+  if (getState('fixtures_init')) {
+    ALL_FIXTURES = getState('fixtures') || [];
+    return;
+  }
+  ALL_FIXTURES = [];
+  const startDate = new Date('2026-06-11');
+  let d = new Date(startDate);
+  const groupKeys = Object.keys(GROUPS);
+  groupKeys.forEach((g, gi) => {
+    const teams = GROUPS[g];
+    const pairs = [];
+    for (let i = 0; i < teams.length; i++) {
+      for (let j = i+1; j < teams.length; j++) {
+        pairs.push({
+          id: `${g}${i}${j}`,
+          group: g,
+          home: teams[i],
+          away: teams[j],
+          date: new Date(d).toISOString().split('T')[0],
+          homeScore: null,
+          awayScore: null,
+        });
+        d.setDate(d.getDate() + 1);
+      }
+    }
+    ALL_FIXTURES.push(...pairs);
+    d = new Date(startDate);
+    d.setDate(d.getDate() + gi + 1);
+  });
+  // Spread fixtures over ~25 days (June 11 - July 5 group stage)
+  // Re-assign dates more evenly
+  const totalDays = 25;
+  ALL_FIXTURES.forEach((f, idx) => {
+    const day = Math.floor((idx / ALL_FIXTURES.length) * totalDays);
+    const dd = new Date('2026-06-11');
+    dd.setDate(dd.getDate() + day);
+    f.date = dd.toISOString().split('T')[0];
+  });
+  saveState('fixtures', ALL_FIXTURES);
+  saveState('fixtures_init', true);
+}
+
+// =====================================================================
+// STATE
+// =====================================================================
+function getState(key) {
+  try { return JSON.parse(localStorage.getItem('wc26_' + key)); } catch { return null; }
+}
+function saveState(key, val) {
+  localStorage.setItem('wc26_' + key, JSON.stringify(val));
+}
+function getMembers() { return getState('members') || {}; }
+function saveMembers(m) { saveState('members', m); }
+function getDraw() { return getState('draw') || null; }
+function saveDraw(d) { saveState('draw', d); }
+function getNotifs() { return getState('notifs') || []; }
+function addNotif(msg, type='info') {
+  const notifs = getNotifs();
+  notifs.unshift({ msg, type, time: new Date().toLocaleString() });
+  if (notifs.length > 100) notifs.pop();
+  saveState('notifs', notifs);
+}
+
+// =====================================================================
+// UTILS
+// =====================================================================
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.opacity = 1;
+  setTimeout(() => t.style.opacity = 0, 3000);
+}
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  const labels = {dashboard:'Dashboard',members:'Members',draw:'Draw',teams:'Teams',
+    fixtures:'Fixtures',results:'Results',leaderboard:'Leaderboard',notifications:'Notifications'};
+  document.querySelectorAll('nav button').forEach(b => {
+    if (b.textContent.includes(labels[id])) b.classList.add('active');
+  });
+  render(id);
+}
+
+function today() { return new Date().toISOString().split('T')[0]; }
+
+function findMemberByTeam(teamName) {
+  const draw = getDraw();
+  if (!draw) return null;
+  for (const [name, teams] of Object.entries(draw)) {
+    if (teams.catA === teamName || teams.catB === teamName) return name;
+  }
+  return null;
+}
+
+function teamFlag(name) {
+  const all = [...TEAMS.A, ...TEAMS.B];
+  return all.find(t => t.name === name)?.flag || '🏳️';
+}
+
+// Points calculation
+function calcPoints() {
+  const draw = getDraw();
+  if (!draw) return {};
+  const pts = {};
+  FAMILY_NAMES.forEach(n => pts[n] = { pts: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 });
+
+  ALL_FIXTURES.forEach(f => {
+    if (f.homeScore === null || f.awayScore === null) return;
+    const hs = parseInt(f.homeScore), as = parseInt(f.awayScore);
+    [f.home, f.away].forEach((team, idx) => {
+      const member = findMemberByTeam(team);
+      if (!member) return;
+      const scored = idx === 0 ? hs : as;
+      const conceded = idx === 0 ? as : hs;
+      pts[member].gf += scored;
+      pts[member].ga += conceded;
+      if (hs === as) { pts[member].pts += 1; pts[member].d++; }
+      else if ((idx === 0 && hs > as) || (idx === 1 && as > hs)) { pts[member].pts += 3; pts[member].w++; }
+      else { pts[member].l++; }
+    });
+  });
+  return pts;
+}
+
+// =====================================================================
+// RENDER FUNCTIONS
+// =====================================================================
+function render(section) {
+  if (section === 'dashboard') renderDashboard();
+  else if (section === 'members') renderMembers();
+  else if (section === 'draw') renderDraw();
+  else if (section === 'teams') renderTeams();
+  else if (section === 'fixtures') renderFixtures();
+  else if (section === 'results') renderResults();
+  else if (section === 'leaderboard') renderLeaderboard();
+  else if (section === 'notifications') renderNotifications();
+}
+
+function renderDashboard() {
+  const members = getMembers();
+  const draw = getDraw();
+  const todayStr = today();
+  const todayMatches = ALL_FIXTURES.filter(f => f.date === todayStr);
+  const played = ALL_FIXTURES.filter(f => f.homeScore !== null).length;
+  const pts = calcPoints();
+  const sorted = FAMILY_NAMES.sort((a,b) => (pts[b]?.pts||0) - (pts[a]?.pts||0));
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-box"><div class="num">${Object.keys(members).length}</div><div class="lbl">Members Registered</div></div>
+    <div class="stat-box"><div class="num">${todayMatches.length}</div><div class="lbl">Matches Today</div></div>
+    <div class="stat-box"><div class="num">${played}</div><div class="lbl">Matches Played</div></div>
+  `;
+
+  if (todayMatches.length === 0) {
+    document.getElementById('dashToday').innerHTML = '<div style="color:var(--muted);font-size:.9rem;">No matches scheduled for today.</div>';
+  } else {
+    document.getElementById('dashToday').innerHTML = todayMatches.map(f => {
+      const hm = findMemberByTeam(f.home), am = findMemberByTeam(f.away);
+      const involved = hm || am;
+      return `<div style="padding:8px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <span class="${hm?'involved':''}">${teamFlag(f.home)} ${f.home}${hm?` <span style="font-size:.7rem;color:var(--muted)">(${hm})</span>`:''}</span>
+        <span class="vs">vs</span>
+        <span class="${am?'involved':''}">${teamFlag(f.away)} ${f.away}${am?` <span style="font-size:.7rem;color:var(--muted)">(${am})</span>`:''}</span>
+        ${involved?`<span class="today-badge">Family!</span>`:''}
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('dashLeader').innerHTML = sorted.slice(0,5).map((n,i) => {
+    const p = pts[n] || {pts:0};
+    return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);">
+      <span><span class="rank rank-${i+1}" style="margin-right:8px;">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1}</span>${n}</span>
+      <strong style="color:var(--gold)">${p.pts} pts</strong>
+    </div>`;
+  }).join('');
+
+  const notifs = getNotifs().slice(0,4);
+  document.getElementById('dashNotif').innerHTML = notifs.length
+    ? notifs.map(n => `<div class="notif-item"><span class="notif-icon">${n.type==='alert'?'📲':'ℹ️'}</span><div><div class="notif-text">${n.msg}</div><div class="notif-time">${n.time}</div></div></div>`).join('')
+    : '<div style="color:var(--muted);font-size:.9rem;padding:8px 0;">No notifications yet.</div>';
+}
+
+function renderMembers() {
+  const members = getMembers();
+  const sel = document.getElementById('memberNameSel');
+  sel.innerHTML = '<option value="">-- Select Member --</option>' +
+    FAMILY_NAMES.map(n => `<option value="${n}" ${members[n]?'':''}">${n}${members[n]?' ✓':''}</option>`).join('');
+  document.getElementById('memberCount').textContent = Object.keys(members).length;
+
+  document.getElementById('memberGrid').innerHTML = FAMILY_NAMES.map(name => {
+    const m = members[name];
+    const draw = getDraw();
+    const teams = draw ? draw[name] : null;
+    return `<div class="member-card">
+      <div class="name">${name}</div>
+      <div class="phone">${m?.phone || '<span style="color:var(--red)">Not registered</span>'}</div>
+      <div class="teams">
+        ${teams ? `<span class="tag tag-a">⭐ ${teams.catA}</span><span class="tag tag-b">${teams.catB}</span>` : '<span style="color:var(--muted);font-size:.8rem;">No draw yet</span>'}
+      </div>
+      ${m ? `<span class="pts-badge">${calcPoints()[name]?.pts || 0}pts</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderDraw() {
+  const draw = getDraw();
+  const members = getMembers();
+  const regCount = Object.keys(members).length;
+
+  document.getElementById('drawStatus').innerHTML = `
+    <div style="display:flex;gap:20px;flex-wrap:wrap;">
+      <span>Registered Members: <strong style="color:var(--gold)">${regCount}/18</strong></span>
+      <span>Draw Status: <strong style="color:${draw?'#4caf50':'#ef5350'}">${draw?'✅ Completed':'⏳ Pending'}</strong></span>
+    </div>
+    ${regCount < 18 ? '<div class="alert alert-warning" style="margin-top:10px;">Not all members have registered phone numbers. Draw can still proceed.</div>' : ''}
+  `;
+
+  if (draw) {
+    document.getElementById('drawResults').style.display = 'block';
+    document.getElementById('drawTable').innerHTML = FAMILY_NAMES.map((name, i) => {
+      const t = draw[name];
+      const m = members[name];
+      return `<tr>
+        <td style="color:var(--muted)">${i+1}</td>
+        <td><strong>${name}</strong></td>
+        <td style="color:var(--muted);font-size:.85rem;">${m?.phone||'—'}</td>
+        <td><span class="badge badge-a">⭐ ${teamFlag(t.catA)} ${t.catA}</span></td>
+        <td><span class="badge badge-b">${teamFlag(t.catB)} ${t.catB}</span></td>
+      </tr>`;
+    }).join('');
+  } else {
+    document.getElementById('drawResults').style.display = 'none';
+  }
+}
+
+function renderTeams() {
+  ['A','B'].forEach(cat => {
+    document.getElementById(`teamList${cat}`).innerHTML = TEAMS[cat].map(t => {
+      const member = findMemberByTeam(t.name);
+      return `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);align-items:center;">
+        <span>${t.flag} <strong>${t.name}</strong> <span style="font-size:.75rem;color:var(--muted)">${t.conf}</span></span>
+        ${member ? `<span class="tag tag-${cat.toLowerCase()}" style="font-size:.75rem;">${member}</span>` : ''}
+      </div>`;
+    }).join('');
+  });
+}
+
+function renderFixtures() {
+  const groups = ['All', ...Object.keys(GROUPS)];
+  document.getElementById('fixtureTabs').innerHTML = groups.map(g =>
+    `<button class="tab-btn${g==='All'?' active':''}" onclick="filterFixtures('${g}',this)">${g==='All'?'All Groups':`Group ${g}`}</button>`
+  ).join('');
+  filterFixtures('All', document.querySelector('.tab-btn'));
+}
+
+function filterFixtures(group, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  const fixtures = group === 'All' ? ALL_FIXTURES : ALL_FIXTURES.filter(f => f.group === group);
+  const todayStr = today();
+  const byDate = {};
+  fixtures.forEach(f => { if (!byDate[f.date]) byDate[f.date] = []; byDate[f.date].push(f); });
+
+  document.getElementById('fixtureContent').innerHTML = Object.entries(byDate).sort().map(([date, matches]) => {
+    const isToday = date === todayStr;
+    return `<div class="group-header">${new Date(date+'T12:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'})}${isToday?'<span class="today-badge">TODAY</span>':''}</div>
+    <table><thead><tr><th>Group</th><th>Home</th><th style="text-align:center">Score</th><th>Away</th><th>Family</th></tr></thead>
+    <tbody>${matches.map(f => {
+      const hm = findMemberByTeam(f.home), am = findMemberByTeam(f.away);
+      const hasFamily = hm || am;
+      const scoreStr = f.homeScore !== null ? `<strong>${f.homeScore} – ${f.awayScore}</strong>` : `<span style="color:var(--muted)">vs</span>`;
+      return `<tr class="${hasFamily?'highlight-row':''}">
+        <td><span class="badge" style="background:var(--blue);color:var(--gold)">Grp ${f.group}</span></td>
+        <td class="match-team ${hm?'involved':''}">${teamFlag(f.home)} ${f.home}</td>
+        <td class="vs">${scoreStr}</td>
+        <td class="match-team ${am?'involved':''}">${teamFlag(f.away)} ${f.away}</td>
+        <td style="font-size:.8rem;">${[hm,am].filter(Boolean).map(m=>`<span style="color:var(--gold)">${m}</span>`).join(', ')||'—'}</td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+  }).join('') || '<div class="alert alert-info">No fixtures found.</div>';
+}
+
+function renderResults() {
+  const gf = document.getElementById('resultGroupFilter');
+  gf.innerHTML = '<option value="">All Groups</option>' +
+    Object.keys(GROUPS).map(g => `<option value="${g}">Group ${g}</option>`).join('');
+
+  const filter = gf.value;
+  const fixtures = filter ? ALL_FIXTURES.filter(f => f.group === filter) : ALL_FIXTURES;
+
+  document.getElementById('resultsList').innerHTML = `<table>
+    <thead><tr><th>Date</th><th>Grp</th><th>Home Team</th><th>Score</th><th>Away Team</th><th>Score</th><th></th></tr></thead>
+    <tbody>${fixtures.map(f => {
+      const hm = findMemberByTeam(f.home), am = findMemberByTeam(f.away);
+      return `<tr class="${(hm||am)?'highlight-row':''}">
+        <td style="font-size:.8rem;color:var(--muted)">${new Date(f.date+'T12:00').toLocaleDateString('en-US',{month:'short',day:'numeric'})}</td>
+        <td><span class="badge" style="background:var(--blue);color:var(--gold);font-size:.75rem">G${f.group}</span></td>
+        <td class="${hm?'involved':''}">${teamFlag(f.home)} ${f.home}${hm?`<br><span style="font-size:.7rem;color:var(--muted)">${hm}</span>`:''}</td>
+        <td><input class="score-input" type="number" min="0" max="20" value="${f.homeScore??''}"
+          onchange="setScore('${f.id}','home',this.value)" placeholder="—"></td>
+        <td class="${am?'involved':''}">${teamFlag(f.away)} ${f.away}${am?`<br><span style="font-size:.7rem;color:var(--muted)">${am}</span>`:''}</td>
+        <td><input class="score-input" type="number" min="0" max="20" value="${f.awayScore??''}"
+          onchange="setScore('${f.id}','away',this.value)" placeholder="—"></td>
+        <td><button class="btn btn-primary btn-sm" onclick="saveResult('${f.id}')">Save</button></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+}
+
+function renderLeaderboard() {
+  const pts = calcPoints();
+  const draw = getDraw();
+  const sorted = [...FAMILY_NAMES].sort((a,b) => {
+    const pa = pts[a]||{pts:0,gf:0,ga:0};
+    const pb = pts[b]||{pts:0,gf:0,ga:0};
+    if (pb.pts !== pa.pts) return pb.pts - pa.pts;
+    return (pb.gf-pb.ga) - (pa.gf-pa.ga);
+  });
+
+  document.getElementById('leaderboardTable').innerHTML = `<table>
+    <thead><tr><th>Rank</th><th>Member</th><th>Cat A Team</th><th>Cat B Team</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th><th>PTS</th></tr></thead>
+    <tbody>${sorted.map((name,i) => {
+      const p = pts[name]||{pts:0,w:0,d:0,l:0,gf:0,ga:0};
+      const t = draw?draw[name]:null;
+      const medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1;
+      return `<tr>
+        <td class="rank rank-${i+1}">${medal}</td>
+        <td><strong>${name}</strong></td>
+        <td>${t?`<span class="tag tag-a">${teamFlag(t.catA)} ${t.catA}</span>`:'—'}</td>
+        <td>${t?`<span class="tag tag-b">${teamFlag(t.catB)} ${t.catB}</span>`:'—'}</td>
+        <td style="color:#66bb6a">${p.w}</td>
+        <td style="color:#ffd54f">${p.d}</td>
+        <td style="color:#ef9a9a">${p.l}</td>
+        <td>${p.gf}</td>
+        <td>${p.ga}</td>
+        <td><strong style="color:var(--gold);font-size:1.1rem">${p.pts}</strong></td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+
+  // Breakdown
+  const members = getMembers();
+  document.getElementById('pointsBreakdown').innerHTML = sorted.map(name => {
+    const t = draw?draw[name]:null;
+    if (!t) return '';
+    const teamMatches = ALL_FIXTURES.filter(f =>
+      (f.home===t.catA||f.away===t.catA||f.home===t.catB||f.away===t.catB) && f.homeScore!==null
+    );
+    if (!teamMatches.length) return '';
+    return `<div style="margin-bottom:12px;">
+      <strong style="color:var(--gold)">${name}</strong>
+      ${teamMatches.map(f => {
+        const isHome = f.home===t.catA||f.home===t.catB;
+        const myTeam = isHome?f.home:f.away;
+        const opp = isHome?f.away:f.home;
+        const ms = isHome?parseInt(f.homeScore):parseInt(f.awayScore);
+        const os = isHome?parseInt(f.awayScore):parseInt(f.homeScore);
+        const result = ms>os?'win':ms===os?'draw':'loss';
+        const pEarned = result==='win'?3:result==='draw'?1:0;
+        return `<span style="margin:2px 4px;display:inline-block;">
+          <span class="badge badge-${result}">${teamFlag(myTeam)} ${myTeam} ${ms}–${os} ${teamFlag(opp)} ${opp} (+${pEarned})</span>
+        </span>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function renderNotifications() {
+  const notifs = getNotifs();
+  document.getElementById('notifLog').innerHTML = notifs.length
+    ? notifs.map(n => `<div class="notif-item"><span class="notif-icon">${n.type==='alert'?'📲':'ℹ️'}</span><div><div class="notif-text">${n.msg}</div><div class="notif-time">${n.time}</div></div></div>`).join('')
+    : '<div style="padding:16px;color:var(--muted)">No notifications yet.</div>';
+  const tw = getState('twilio') || {};
+  if (tw.sid) document.getElementById('twilioSID').value = tw.sid;
+  if (tw.token) document.getElementById('twilioToken').value = tw.token;
+  if (tw.from) document.getElementById('twilioFrom').value = tw.from;
+}
+
+// =====================================================================
+// ACTIONS
+// =====================================================================
+function saveMember() {
+  const name = document.getElementById('memberNameSel').value;
+  const phone = document.getElementById('memberPhone').value.trim();
+  if (!name) return toast('Please select a member name');
+  if (!phone) return toast('Please enter a phone number');
+  const members = getMembers();
+  members[name] = { phone };
+  saveMembers(members);
+  document.getElementById('memberPhone').value = '';
+  toast(`✅ ${name} registered!`);
+  addNotif(`${name} registered with phone ${phone}`);
+  renderMembers();
+}
+
+function runDraw() {
+  if (getDraw() && !confirm('A draw already exists. Re-running will overwrite it. Continue?')) return;
+  const catA = [...TEAMS.A].sort(() => Math.random() - 0.5).slice(0, 18).map(t => t.name);
+  const catB = [...TEAMS.B].sort(() => Math.random() - 0.5).slice(0, 18).map(t => t.name);
+  const draw = {};
+  const members = getMembers();
+  FAMILY_NAMES.forEach((name, i) => {
+    draw[name] = { catA: catA[i], catB: catB[i] };
+  });
+  saveDraw(draw);
+  toast('🎲 Draw complete! Teams assigned.');
+  addNotif('Family draw completed — teams assigned to all 18 members', 'alert');
+  renderDraw();
+}
+
+function clearDraw() {
+  if (!confirm('Clear all draw assignments?')) return;
+  saveDraw(null);
+  toast('Draw cleared.');
+  renderDraw();
+}
+
+function setScore(fixtureId, side, val) {
+  const f = ALL_FIXTURES.find(x => x.id === fixtureId);
+  if (!f) return;
+  if (side === 'home') f.homeScore = val === '' ? null : parseInt(val);
+  else f.awayScore = val === '' ? null : parseInt(val);
+}
+
+function saveResult(fixtureId) {
+  const f = ALL_FIXTURES.find(x => x.id === fixtureId);
+  if (!f) return;
+  if (f.homeScore === null || f.awayScore === null) return toast('Enter both scores first');
+  saveState('fixtures', ALL_FIXTURES);
+  const hm = findMemberByTeam(f.home), am = findMemberByTeam(f.away);
+  let note = `Result: ${f.home} ${f.homeScore}–${f.awayScore} ${f.away}`;
+  if (hm) note += ` | ${hm}'s team`;
+  if (am) note += ` | ${am}'s team`;
+  addNotif(note);
+  toast(`✅ Result saved: ${f.home} ${f.homeScore}–${f.awayScore} ${f.away}`);
+}
+
+function saveTwilio() {
+  const sid = document.getElementById('twilioSID').value.trim();
+  const token = document.getElementById('twilioToken').value.trim();
+  const from = document.getElementById('twilioFrom').value.trim();
+  saveState('twilio', { sid, token, from });
+  toast('Twilio settings saved.');
+}
+
+function sendTodayAlert() {
+  const members = getMembers();
+  const todayStr = today();
+  const todayMatches = ALL_FIXTURES.filter(f => f.date === todayStr);
+  if (todayMatches.length === 0) { toast('No matches today!'); return; }
+
+  const matchSummary = todayMatches.map(f => `${teamFlag(f.home)} ${f.home} vs ${teamFlag(f.away)} ${f.away} (Group ${f.group})`).join('\n');
+
+  FAMILY_NAMES.forEach(name => {
+    const draw = getDraw();
+    if (!draw || !members[name]) return;
+    const myTeams = [draw[name]?.catA, draw[name]?.catB];
+    const myMatches = todayMatches.filter(f => myTeams.includes(f.home) || myTeams.includes(f.away));
+
+    let msg = `⚽ World Cup Match Day!\n${matchSummary}`;
+    if (myMatches.length) {
+      msg += `\n\n🌟 YOUR TEAMS PLAY TODAY:\n` + myMatches.map(f => `${f.home} vs ${f.away}`).join('\n');
+    }
+    addNotif(`[SMS to ${members[name].phone}] ${msg}`, 'alert');
+  });
+
+  toast(`📲 Notifications logged for ${Object.keys(members).length} members!`);
+  renderNotifications();
+}
+
+// =====================================================================
+// INIT
+// =====================================================================
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('headerDate').textContent =
+    `FIFA World Cup 2026 — Today: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+  initFixtures();
+  render('dashboard');
+});
+</script>
+</body>
+</html>
