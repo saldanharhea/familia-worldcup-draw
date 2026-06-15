@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>⚽ Familia World Cup Draw 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
     --gold: #FFD700;
@@ -535,24 +536,81 @@ function initFixtures() {
 }
 
 // =====================================================================
-// STATE
+// SUPABASE
 // =====================================================================
+const SUPA_URL = 'https://jhpgljedbtctvqbvszgk.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpocGdsamVkYnRjdHZxYnZzemdrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1Mzc3MjUsImV4cCI6MjA5NzExMzcyNX0.QfnRFbm3-BmIVda2-aFvOD97wSSAV4dkzsLAIiWE5k4';
+const db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// =====================================================================
+// STATE — in-memory cache loaded from Supabase on init
+// =====================================================================
+const STATE = { members: {}, draw: null, notifs: [] };
+
+async function loadFromDB() {
+  const [{ data: members }, { data: draw }, { data: results }] = await Promise.all([
+    db.from('members').select('*'),
+    db.from('draw').select('*'),
+    db.from('results').select('*'),
+  ]);
+  STATE.members = {};
+  (members || []).forEach(m => STATE.members[m.name] = { phone: m.phone });
+  STATE.draw = null;
+  if (draw && draw.length) {
+    STATE.draw = {};
+    draw.forEach(d => STATE.draw[d.name] = { catA: d.cat_a, catB: d.cat_b });
+  }
+  // Apply saved results to fixtures
+  (results || []).forEach(r => {
+    const f = ALL_FIXTURES.find(x => x.id === r.fixture_id);
+    if (f) { f.homeScore = r.home_score; f.awayScore = r.away_score; }
+  });
+}
+
+function getMembers() { return STATE.members; }
+function getDraw() { return STATE.draw; }
+
+async function saveMemberToDB(name, phone) {
+  const { error } = await db.from('members').upsert({ name, phone });
+  if (error) throw error;
+  STATE.members[name] = { phone };
+}
+
+async function saveDrawToDB(draw) {
+  const rows = Object.entries(draw).map(([name, t]) => ({ name, cat_a: t.catA, cat_b: t.catB }));
+  const { error } = await db.from('draw').upsert(rows);
+  if (error) throw error;
+  STATE.draw = draw;
+}
+
+async function clearDrawFromDB() {
+  const { error } = await db.from('draw').delete().neq('name', '');
+  if (error) throw error;
+  STATE.draw = null;
+}
+
+async function saveResultToDB(fixtureId, homeScore, awayScore) {
+  const { error } = await db.from('results').upsert({ fixture_id: fixtureId, home_score: homeScore, away_score: awayScore });
+  if (error) throw error;
+}
+
+// Notifications stay local
+function getNotifs() {
+  try { return JSON.parse(localStorage.getItem('wc26_notifs')) || []; } catch { return []; }
+}
+function addNotif(msg, type='info') {
+  const notifs = getNotifs();
+  notifs.unshift({ msg, type, time: new Date().toLocaleString() });
+  if (notifs.length > 100) notifs.pop();
+  localStorage.setItem('wc26_notifs', JSON.stringify(notifs));
+}
+
+// Keep fixtures in localStorage (static data)
 function getState(key) {
   try { return JSON.parse(localStorage.getItem('wc26_' + key)); } catch { return null; }
 }
 function saveState(key, val) {
   localStorage.setItem('wc26_' + key, JSON.stringify(val));
-}
-function getMembers() { return getState('members') || {}; }
-function saveMembers(m) { saveState('members', m); }
-function getDraw() { return getState('draw') || null; }
-function saveDraw(d) { saveState('draw', d); }
-function getNotifs() { return getState('notifs') || []; }
-function addNotif(msg, type='info') {
-  const notifs = getNotifs();
-  notifs.unshift({ msg, type, time: new Date().toLocaleString() });
-  if (notifs.length > 100) notifs.pop();
-  saveState('notifs', notifs);
 }
 
 // =====================================================================
@@ -728,15 +786,15 @@ function toggleRegister(name) {
   }
 }
 
-function saveMemberInline(name) {
+async function saveMemberInline(name) {
   const phone = document.getElementById(`phone_field_${name}`).value.trim();
   if (!phone) { toast('Enter a phone number'); return; }
-  const members = getMembers();
-  members[name] = { phone };
-  saveMembers(members);
-  addNotif(`${name} registered with phone ${phone}`);
-  toast(`✅ ${name} saved!`);
-  renderMembers();
+  try {
+    await saveMemberToDB(name, phone);
+    addNotif(`${name} registered with phone ${phone}`);
+    toast(`✅ ${name} saved!`);
+    renderMembers();
+  } catch(e) { toast('❌ Error: ' + e.message); }
 }
 
 function renderDraw() {
@@ -915,26 +973,27 @@ function renderNotifications() {
 // ACTIONS
 // =====================================================================
 
-function runDraw() {
+async function runDraw() {
   if (getDraw() && !confirm('A draw already exists. Re-running will overwrite it. Continue?')) return;
   const catA = [...TEAMS.A].sort(() => Math.random() - 0.5).slice(0, 18).map(t => t.name);
   const catB = [...TEAMS.B].sort(() => Math.random() - 0.5).slice(0, 18).map(t => t.name);
   const draw = {};
-  const members = getMembers();
-  FAMILY_NAMES.forEach((name, i) => {
-    draw[name] = { catA: catA[i], catB: catB[i] };
-  });
-  saveDraw(draw);
-  toast('🎲 Draw complete! Teams assigned.');
-  addNotif('Family draw completed — teams assigned to all 18 members', 'alert');
-  renderDraw();
+  FAMILY_NAMES.forEach((name, i) => { draw[name] = { catA: catA[i], catB: catB[i] }; });
+  try {
+    await saveDrawToDB(draw);
+    toast('🎲 Draw complete! Teams assigned.');
+    addNotif('Family draw completed — teams assigned to all 18 members', 'alert');
+    renderDraw();
+  } catch(e) { toast('❌ Error saving draw: ' + e.message); }
 }
 
-function clearDraw() {
+async function clearDraw() {
   if (!confirm('Clear all draw assignments?')) return;
-  saveDraw(null);
-  toast('Draw cleared.');
-  renderDraw();
+  try {
+    await clearDrawFromDB();
+    toast('Draw cleared.');
+    renderDraw();
+  } catch(e) { toast('❌ Error: ' + e.message); }
 }
 
 function setScore(fixtureId, side, val) {
@@ -944,17 +1003,19 @@ function setScore(fixtureId, side, val) {
   else f.awayScore = val === '' ? null : parseInt(val);
 }
 
-function saveResult(fixtureId) {
+async function saveResult(fixtureId) {
   const f = ALL_FIXTURES.find(x => x.id === fixtureId);
   if (!f) return;
   if (f.homeScore === null || f.awayScore === null) return toast('Enter both scores first');
-  saveState('fixtures', ALL_FIXTURES);
-  const hm = findMemberByTeam(f.home), am = findMemberByTeam(f.away);
-  let note = `Result: ${f.home} ${f.homeScore}–${f.awayScore} ${f.away}`;
-  if (hm) note += ` | ${hm}'s team`;
-  if (am) note += ` | ${am}'s team`;
-  addNotif(note);
-  toast(`✅ Result saved: ${f.home} ${f.homeScore}–${f.awayScore} ${f.away}`);
+  try {
+    await saveResultToDB(f.id, f.homeScore, f.awayScore);
+    const hm = findMemberByTeam(f.home), am = findMemberByTeam(f.away);
+    let note = `Result: ${f.home} ${f.homeScore}–${f.awayScore} ${f.away}`;
+    if (hm) note += ` | ${hm}'s team`;
+    if (am) note += ` | ${am}'s team`;
+    addNotif(note);
+    toast(`✅ Result saved: ${f.home} ${f.homeScore}–${f.awayScore} ${f.away}`);
+  } catch(e) { toast('❌ Error saving result: ' + e.message); }
 }
 
 function saveTwilio() {
@@ -993,10 +1054,15 @@ function sendTodayAlert() {
 // =====================================================================
 // INIT
 // =====================================================================
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('headerDate').textContent =
     `FIFA World Cup 2026 — Today: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
   initFixtures();
+  try {
+    await loadFromDB();
+  } catch(e) {
+    console.error('Supabase load error:', e);
+  }
   render('dashboard');
   setTimeout(() => {
     const splash = document.getElementById('splash');
