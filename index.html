@@ -469,68 +469,96 @@ const GROUPS = {
   'L': ['Croatia','England','Ghana','Panama'],
 };
 
-// Generate round-robin fixtures per group
-function genGroupFixtures(group, teams, baseDate, matchNum) {
-  const pairs = [];
-  const d = new Date(baseDate);
-  for (let i = 0; i < teams.length; i++) {
-    for (let j = i+1; j < teams.length; j++) {
-      pairs.push({
-        id: `g${group}${i}${j}`,
-        group,
-        home: teams[i],
-        away: teams[j],
-        date: new Date(d).toISOString().split('T')[0],
-        homeScore: null,
-        awayScore: null,
-      });
-      d.setDate(d.getDate() + 1);
-    }
-  }
-  return pairs;
-}
-
 let ALL_FIXTURES = [];
 
 function initFixtures() {
-  // Always regenerate — teams/groups may have changed
-  saveState('fixtures_init', false);
-  ALL_FIXTURES = [];
-  const startDate = new Date('2026-06-11');
-  let d = new Date(startDate);
-  const groupKeys = Object.keys(GROUPS);
-  groupKeys.forEach((g, gi) => {
-    const teams = GROUPS[g];
-    const pairs = [];
-    for (let i = 0; i < teams.length; i++) {
-      for (let j = i+1; j < teams.length; j++) {
-        pairs.push({
-          id: `${g}${i}${j}`,
-          group: g,
-          home: teams[i],
-          away: teams[j],
-          date: new Date(d).toISOString().split('T')[0],
-          homeScore: null,
-          awayScore: null,
-        });
-        d.setDate(d.getDate() + 1);
-      }
-    }
-    ALL_FIXTURES.push(...pairs);
-    d = new Date(startDate);
-    d.setDate(d.getDate() + gi + 1);
-  });
-  // Spread fixtures over ~25 days (June 11 - July 5 group stage)
-  // Re-assign dates more evenly
-  const totalDays = 25;
-  ALL_FIXTURES.forEach((f, idx) => {
-    const day = Math.floor((idx / ALL_FIXTURES.length) * totalDays);
-    const dd = new Date('2026-06-11');
-    dd.setDate(dd.getDate() + day);
-    f.date = dd.toISOString().split('T')[0];
-  });
-  saveState('fixtures', ALL_FIXTURES);
-  saveState('fixtures_init', true);
+  ALL_FIXTURES = [
+    // GROUP A: Czechia, Korea Republic, Mexico, South Africa
+    {id:'A1',group:'A',home:'Mexico',away:'South Africa',date:'2026-06-11',homeScore:null,awayScore:null},
+    {id:'A2',group:'A',home:'Korea Republic',away:'Czechia',date:'2026-06-11',homeScore:null,awayScore:null},
+    {id:'A3',group:'A',home:'Czechia',away:'South Africa',date:'2026-06-18',homeScore:null,awayScore:null},
+    {id:'A4',group:'A',home:'Mexico',away:'Korea Republic',date:'2026-06-18',homeScore:null,awayScore:null},
+    {id:'A5',group:'A',home:'Czechia',away:'Mexico',date:'2026-06-24',homeScore:null,awayScore:null},
+    {id:'A6',group:'A',home:'South Africa',away:'Korea Republic',date:'2026-06-24',homeScore:null,awayScore:null},
+    // GROUP B: Bosnia and Herzegovina, Canada, Qatar, Switzerland
+    {id:'B1',group:'B',home:'Canada',away:'Bosnia and Herzegovina',date:'2026-06-12',homeScore:null,awayScore:null},
+    {id:'B2',group:'B',home:'Switzerland',away:'Qatar',date:'2026-06-12',homeScore:null,awayScore:null},
+    {id:'B3',group:'B',home:'Switzerland',away:'Bosnia and Herzegovina',date:'2026-06-18',homeScore:null,awayScore:null},
+    {id:'B4',group:'B',home:'Canada',away:'Qatar',date:'2026-06-18',homeScore:null,awayScore:null},
+    {id:'B5',group:'B',home:'Switzerland',away:'Canada',date:'2026-06-24',homeScore:null,awayScore:null},
+    {id:'B6',group:'B',home:'Bosnia and Herzegovina',away:'Qatar',date:'2026-06-24',homeScore:null,awayScore:null},
+    // GROUP C: Brazil, Haiti, Morocco, Scotland
+    {id:'C1',group:'C',home:'Brazil',away:'Morocco',date:'2026-06-13',homeScore:null,awayScore:null},
+    {id:'C2',group:'C',home:'Haiti',away:'Scotland',date:'2026-06-13',homeScore:null,awayScore:null},
+    {id:'C3',group:'C',home:'Scotland',away:'Morocco',date:'2026-06-19',homeScore:null,awayScore:null},
+    {id:'C4',group:'C',home:'Brazil',away:'Haiti',date:'2026-06-19',homeScore:null,awayScore:null},
+    {id:'C5',group:'C',home:'Scotland',away:'Brazil',date:'2026-06-24',homeScore:null,awayScore:null},
+    {id:'C6',group:'C',home:'Morocco',away:'Haiti',date:'2026-06-24',homeScore:null,awayScore:null},
+    // GROUP D: Australia, Paraguay, Türkiye, USA
+    {id:'D1',group:'D',home:'USA',away:'Paraguay',date:'2026-06-12',homeScore:null,awayScore:null},
+    {id:'D2',group:'D',home:'Australia',away:'Türkiye',date:'2026-06-13',homeScore:null,awayScore:null},
+    {id:'D3',group:'D',home:'USA',away:'Australia',date:'2026-06-19',homeScore:null,awayScore:null},
+    {id:'D4',group:'D',home:'Paraguay',away:'Türkiye',date:'2026-06-19',homeScore:null,awayScore:null},
+    {id:'D5',group:'D',home:'Türkiye',away:'USA',date:'2026-06-25',homeScore:null,awayScore:null},
+    {id:'D6',group:'D',home:'Paraguay',away:'Australia',date:'2026-06-25',homeScore:null,awayScore:null},
+    // GROUP E: Côte d'Ivoire, Curaçao, Ecuador, Germany
+    {id:'E1',group:'E',home:'Germany',away:'Curaçao',date:'2026-06-14',homeScore:null,awayScore:null},
+    {id:'E2',group:'E',home:"Côte d'Ivoire",away:'Ecuador',date:'2026-06-14',homeScore:null,awayScore:null},
+    {id:'E3',group:'E',home:'Germany',away:"Côte d'Ivoire",date:'2026-06-20',homeScore:null,awayScore:null},
+    {id:'E4',group:'E',home:'Ecuador',away:'Curaçao',date:'2026-06-20',homeScore:null,awayScore:null},
+    {id:'E5',group:'E',home:'Ecuador',away:'Germany',date:'2026-06-25',homeScore:null,awayScore:null},
+    {id:'E6',group:'E',home:'Curaçao',away:"Côte d'Ivoire",date:'2026-06-25',homeScore:null,awayScore:null},
+    // GROUP F: Japan, Netherlands, Sweden, Tunisia
+    {id:'F1',group:'F',home:'Netherlands',away:'Japan',date:'2026-06-14',homeScore:null,awayScore:null},
+    {id:'F2',group:'F',home:'Sweden',away:'Tunisia',date:'2026-06-14',homeScore:null,awayScore:null},
+    {id:'F3',group:'F',home:'Netherlands',away:'Sweden',date:'2026-06-20',homeScore:null,awayScore:null},
+    {id:'F4',group:'F',home:'Tunisia',away:'Japan',date:'2026-06-20',homeScore:null,awayScore:null},
+    {id:'F5',group:'F',home:'Tunisia',away:'Netherlands',date:'2026-06-25',homeScore:null,awayScore:null},
+    {id:'F6',group:'F',home:'Japan',away:'Sweden',date:'2026-06-25',homeScore:null,awayScore:null},
+    // GROUP G: Belgium, Egypt, IR Iran, New Zealand
+    {id:'G1',group:'G',home:'Belgium',away:'Egypt',date:'2026-06-15',homeScore:null,awayScore:null},
+    {id:'G2',group:'G',home:'IR Iran',away:'New Zealand',date:'2026-06-15',homeScore:null,awayScore:null},
+    {id:'G3',group:'G',home:'Belgium',away:'IR Iran',date:'2026-06-21',homeScore:null,awayScore:null},
+    {id:'G4',group:'G',home:'New Zealand',away:'Egypt',date:'2026-06-21',homeScore:null,awayScore:null},
+    {id:'G5',group:'G',home:'Egypt',away:'IR Iran',date:'2026-06-26',homeScore:null,awayScore:null},
+    {id:'G6',group:'G',home:'New Zealand',away:'Belgium',date:'2026-06-26',homeScore:null,awayScore:null},
+    // GROUP H: Cabo Verde, Saudi Arabia, Spain, Uruguay
+    {id:'H1',group:'H',home:'Spain',away:'Cabo Verde',date:'2026-06-15',homeScore:null,awayScore:null},
+    {id:'H2',group:'H',home:'Saudi Arabia',away:'Uruguay',date:'2026-06-15',homeScore:null,awayScore:null},
+    {id:'H3',group:'H',home:'Spain',away:'Saudi Arabia',date:'2026-06-21',homeScore:null,awayScore:null},
+    {id:'H4',group:'H',home:'Uruguay',away:'Cabo Verde',date:'2026-06-21',homeScore:null,awayScore:null},
+    {id:'H5',group:'H',home:'Cabo Verde',away:'Saudi Arabia',date:'2026-06-26',homeScore:null,awayScore:null},
+    {id:'H6',group:'H',home:'Uruguay',away:'Spain',date:'2026-06-26',homeScore:null,awayScore:null},
+    // GROUP I: France, Iraq, Norway, Senegal
+    {id:'I1',group:'I',home:'France',away:'Senegal',date:'2026-06-16',homeScore:null,awayScore:null},
+    {id:'I2',group:'I',home:'Iraq',away:'Norway',date:'2026-06-16',homeScore:null,awayScore:null},
+    {id:'I3',group:'I',home:'France',away:'Iraq',date:'2026-06-22',homeScore:null,awayScore:null},
+    {id:'I4',group:'I',home:'Norway',away:'Senegal',date:'2026-06-22',homeScore:null,awayScore:null},
+    {id:'I5',group:'I',home:'Norway',away:'France',date:'2026-06-26',homeScore:null,awayScore:null},
+    {id:'I6',group:'I',home:'Senegal',away:'Iraq',date:'2026-06-26',homeScore:null,awayScore:null},
+    // GROUP J: Algeria, Argentina, Austria, Jordan
+    {id:'J1',group:'J',home:'Argentina',away:'Algeria',date:'2026-06-16',homeScore:null,awayScore:null},
+    {id:'J2',group:'J',home:'Austria',away:'Jordan',date:'2026-06-16',homeScore:null,awayScore:null},
+    {id:'J3',group:'J',home:'Argentina',away:'Austria',date:'2026-06-22',homeScore:null,awayScore:null},
+    {id:'J4',group:'J',home:'Jordan',away:'Algeria',date:'2026-06-22',homeScore:null,awayScore:null},
+    {id:'J5',group:'J',home:'Algeria',away:'Austria',date:'2026-06-27',homeScore:null,awayScore:null},
+    {id:'J6',group:'J',home:'Jordan',away:'Argentina',date:'2026-06-27',homeScore:null,awayScore:null},
+    // GROUP K: Colombia, Congo DR, Portugal, Uzbekistan
+    {id:'K1',group:'K',home:'Portugal',away:'Congo DR',date:'2026-06-17',homeScore:null,awayScore:null},
+    {id:'K2',group:'K',home:'Uzbekistan',away:'Colombia',date:'2026-06-17',homeScore:null,awayScore:null},
+    {id:'K3',group:'K',home:'Portugal',away:'Uzbekistan',date:'2026-06-23',homeScore:null,awayScore:null},
+    {id:'K4',group:'K',home:'Colombia',away:'Congo DR',date:'2026-06-23',homeScore:null,awayScore:null},
+    {id:'K5',group:'K',home:'Colombia',away:'Portugal',date:'2026-06-26',homeScore:null,awayScore:null},
+    {id:'K6',group:'K',home:'Congo DR',away:'Uzbekistan',date:'2026-06-27',homeScore:null,awayScore:null},
+    // GROUP L: Croatia, England, Ghana, Panama
+    {id:'L1',group:'L',home:'England',away:'Croatia',date:'2026-06-17',homeScore:null,awayScore:null},
+    {id:'L2',group:'L',home:'Ghana',away:'Panama',date:'2026-06-17',homeScore:null,awayScore:null},
+    {id:'L3',group:'L',home:'England',away:'Ghana',date:'2026-06-23',homeScore:null,awayScore:null},
+    {id:'L4',group:'L',home:'Panama',away:'Croatia',date:'2026-06-23',homeScore:null,awayScore:null},
+    {id:'L5',group:'L',home:'Panama',away:'England',date:'2026-06-27',homeScore:null,awayScore:null},
+    {id:'L6',group:'L',home:'Croatia',away:'Ghana',date:'2026-06-27',homeScore:null,awayScore:null},
+  ];
+  // Restore saved results from Supabase (applied after loadFromDB)
 }
 
 // =====================================================================
