@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>⚽ Family World Cup Draw 2026</title>
+<title>⚽ Familia World Cup Draw 2026</title>
 <style>
   :root {
     --gold: #FFD700;
@@ -34,7 +34,32 @@
     display: flex; align-items: center; gap: 16px;
     flex-wrap: wrap;
   }
-  header h1 { font-size: 1.6rem; color: var(--gold); letter-spacing: 1px; }
+  header h1 { font-size: 1.6rem; color: var(--gold); letter-spacing: 1px; font-family: Georgia, serif; }
+  /* Splash */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(160deg, #0a1628 0%, #0d3320 50%, #0a1628 100%);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 16px; transition: opacity .6s ease;
+  }
+  #splash.hide { opacity: 0; pointer-events: none; }
+  .splash-ball { font-size: 5rem; animation: spin 1.8s linear infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .splash-title {
+    font-size: 2.4rem; font-weight: 800; color: var(--gold);
+    font-family: Georgia, serif; letter-spacing: 2px; text-align: center;
+    text-shadow: 0 0 30px rgba(255,215,0,.5);
+  }
+  .splash-sub { color: #8BA4B8; font-size: 1rem; letter-spacing: 4px; text-transform: uppercase; }
+  .splash-bar {
+    width: 200px; height: 3px; background: rgba(255,255,255,.1);
+    border-radius: 2px; margin-top: 24px; overflow: hidden;
+  }
+  .splash-bar-fill {
+    height: 100%; background: var(--gold);
+    animation: load 2s ease forwards;
+  }
+  @keyframes load { from { width: 0%; } to { width: 100%; } }
   header p { color: var(--muted); font-size: .85rem; }
   nav {
     background: var(--card);
@@ -169,10 +194,17 @@
 </head>
 <body>
 
+<div id="splash">
+  <div class="splash-ball">⚽</div>
+  <div class="splash-title">Familia World Cup Draw</div>
+  <div class="splash-sub">FIFA 2026 · USA · Canada · Mexico</div>
+  <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+</div>
+
 <header>
   <div>⚽</div>
   <div>
-    <h1>Family World Cup Draw 2026</h1>
+    <h1>Familia World Cup Draw</h1>
     <p id="headerDate">FIFA World Cup 2026 — USA · Canada · Mexico</p>
   </div>
 </header>
@@ -225,26 +257,11 @@
 <!-- MEMBERS -->
 <div id="members" class="section">
   <h2>👨‍👩‍👧‍👦 Family Members</h2>
-  <div class="card" id="memberForm">
-    <h3>Add / Edit Member</h3>
-    <div class="grid-2">
-      <div class="form-group">
-        <label>Name</label>
-        <select id="memberNameSel">
-          <option value="">-- Select Member --</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="tel" id="memberPhone" placeholder="+1 234 567 8900">
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="saveMember()">Save Member</button>
+  <div class="alert alert-info" style="margin-bottom:16px;">
+    Tap any member card to add or update their phone number.
+    <strong style="color:var(--gold)"> <span id="memberCount">0</span>/18 registered.</strong>
   </div>
-  <div class="card">
-    <h3>Registered Members (<span id="memberCount">0</span>/18)</h3>
-    <div id="memberGrid" class="grid-3"></div>
-  </div>
+  <div id="memberGrid" class="grid-3"></div>
 </div>
 
 <!-- DRAW -->
@@ -660,24 +677,66 @@ function renderDashboard() {
 
 function renderMembers() {
   const members = getMembers();
-  const sel = document.getElementById('memberNameSel');
-  sel.innerHTML = '<option value="">-- Select Member --</option>' +
-    FAMILY_NAMES.map(n => `<option value="${n}" ${members[n]?'':''}">${n}${members[n]?' ✓':''}</option>`).join('');
   document.getElementById('memberCount').textContent = Object.keys(members).length;
+  const draw = getDraw();
+  const pts = calcPoints();
 
   document.getElementById('memberGrid').innerHTML = FAMILY_NAMES.map(name => {
     const m = members[name];
-    const draw = getDraw();
     const teams = draw ? draw[name] : null;
-    return `<div class="member-card">
-      <div class="name">${name}</div>
-      <div class="phone">${m?.phone || '<span style="color:var(--red)">Not registered</span>'}</div>
-      <div class="teams">
-        ${teams ? `<span class="tag tag-a">⭐ ${teams.catA}</span><span class="tag tag-b">${teams.catB}</span>` : '<span style="color:var(--muted);font-size:.8rem;">No draw yet</span>'}
+    const registered = !!m?.phone;
+    return `<div class="member-card" style="cursor:pointer;${registered?'border-color:rgba(76,175,80,.4)':''}" onclick="toggleRegister('${name}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div class="name">${name}</div>
+          <div class="phone" id="phone_display_${name}">
+            ${registered
+              ? `<span style="color:#66bb6a">✓ ${m.phone}</span>`
+              : `<span style="color:var(--red)">Tap to register</span>`}
+          </div>
+        </div>
+        ${registered ? `<span class="pts-badge">${pts[name]?.pts || 0}pts</span>` : ''}
       </div>
-      ${m ? `<span class="pts-badge">${calcPoints()[name]?.pts || 0}pts</span>` : ''}
+      <div id="phone_input_${name}" style="display:none;margin-top:10px;">
+        <input type="tel" placeholder="Phone number" value="${m?.phone||''}"
+          id="phone_field_${name}" onclick="event.stopPropagation()"
+          style="margin-bottom:8px;" />
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();saveMemberInline('${name}')">Save</button>
+          <button class="btn btn-sm" style="background:var(--border);color:var(--text);" onclick="event.stopPropagation();toggleRegister('${name}')">Cancel</button>
+        </div>
+      </div>
+      <div class="teams" style="margin-top:10px;">
+        ${teams
+          ? `<span class="tag tag-a">⭐ ${teamFlag(teams.catA)} ${teams.catA}</span><span class="tag tag-b">${teamFlag(teams.catB)} ${teams.catB}</span>`
+          : `<span style="color:var(--muted);font-size:.8rem;">No draw yet</span>`}
+      </div>
     </div>`;
   }).join('');
+}
+
+function toggleRegister(name) {
+  const el = document.getElementById(`phone_input_${name}`);
+  const isOpen = el.style.display !== 'none';
+  // close all others first
+  FAMILY_NAMES.forEach(n => {
+    document.getElementById(`phone_input_${n}`).style.display = 'none';
+  });
+  if (!isOpen) {
+    el.style.display = 'block';
+    document.getElementById(`phone_field_${name}`).focus();
+  }
+}
+
+function saveMemberInline(name) {
+  const phone = document.getElementById(`phone_field_${name}`).value.trim();
+  if (!phone) { toast('Enter a phone number'); return; }
+  const members = getMembers();
+  members[name] = { phone };
+  saveMembers(members);
+  addNotif(`${name} registered with phone ${phone}`);
+  toast(`✅ ${name} saved!`);
+  renderMembers();
 }
 
 function renderDraw() {
@@ -855,19 +914,6 @@ function renderNotifications() {
 // =====================================================================
 // ACTIONS
 // =====================================================================
-function saveMember() {
-  const name = document.getElementById('memberNameSel').value;
-  const phone = document.getElementById('memberPhone').value.trim();
-  if (!name) return toast('Please select a member name');
-  if (!phone) return toast('Please enter a phone number');
-  const members = getMembers();
-  members[name] = { phone };
-  saveMembers(members);
-  document.getElementById('memberPhone').value = '';
-  toast(`✅ ${name} registered!`);
-  addNotif(`${name} registered with phone ${phone}`);
-  renderMembers();
-}
 
 function runDraw() {
   if (getDraw() && !confirm('A draw already exists. Re-running will overwrite it. Continue?')) return;
@@ -952,6 +998,11 @@ document.addEventListener('DOMContentLoaded', () => {
     `FIFA World Cup 2026 — Today: ${new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
   initFixtures();
   render('dashboard');
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 700);
+  }, 2200);
 });
 </script>
 </body>
