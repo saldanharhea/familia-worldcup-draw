@@ -416,57 +416,57 @@ const TEAMS = {
     {name:'Japan',flag:'🇯🇵',conf:'AFC'},
     {name:'Croatia',flag:'🇭🇷',conf:'UEFA'},
     {name:'Senegal',flag:'🇸🇳',conf:'CAF'},
-    {name:'Denmark',flag:'🇩🇰',conf:'UEFA'},
+    {name:'Norway',flag:'🇳🇴',conf:'UEFA'},
     {name:'Switzerland',flag:'🇨🇭',conf:'UEFA'},
-    {name:'South Korea',flag:'🇰🇷',conf:'AFC'},
+    {name:'Korea Republic',flag:'🇰🇷',conf:'AFC'},
     {name:'Ecuador',flag:'🇪🇨',conf:'CONMEBOL'},
-    {name:'Turkey',flag:'🇹🇷',conf:'UEFA'},
-    {name:'Serbia',flag:'🇷🇸',conf:'UEFA'},
-    {name:'Austria',flag:'🇦🇹',conf:'UEFA'},
+    {name:'Türkiye',flag:'🇹🇷',conf:'UEFA'},
+    {name:'Sweden',flag:'🇸🇪',conf:'UEFA'},
+    {name:'Bosnia and Herzegovina',flag:'🇧🇦',conf:'UEFA'},
   ],
   B: [
-    {name:'Canada',flag:'🇨🇦',conf:'CONCACAF'},
-    {name:'Poland',flag:'🇵🇱',conf:'UEFA'},
-    {name:'Iran',flag:'🇮🇷',conf:'AFC'},
-    {name:'Saudi Arabia',flag:'🇸🇦',conf:'AFC'},
-    {name:'Ghana',flag:'🇬🇭',conf:'CAF'},
-    {name:'Cameroon',flag:'🇨🇲',conf:'CAF'},
-    {name:'Ivory Coast',flag:'🇨🇮',conf:'CAF'},
-    {name:'Nigeria',flag:'🇳🇬',conf:'CAF'},
     {name:'Algeria',flag:'🇩🇿',conf:'CAF'},
+    {name:'Australia',flag:'🇦🇺',conf:'AFC'},
+    {name:'Austria',flag:'🇦🇹',conf:'UEFA'},
+    {name:'Cabo Verde',flag:'🇨🇻',conf:'CAF'},
+    {name:'Canada',flag:'🇨🇦',conf:'CONCACAF'},
+    {name:'Congo DR',flag:'🇨🇩',conf:'CAF'},
+    {name:"Côte d'Ivoire",flag:'🇨🇮',conf:'CAF'},
+    {name:'Curaçao',flag:'🇨🇼',conf:'CONCACAF'},
+    {name:'Czechia',flag:'🇨🇿',conf:'UEFA'},
     {name:'Egypt',flag:'🇪🇬',conf:'CAF'},
-    {name:'Tunisia',flag:'🇹🇳',conf:'CAF'},
-    {name:'Costa Rica',flag:'🇨🇷',conf:'CONCACAF'},
-    {name:'Honduras',flag:'🇭🇳',conf:'CONCACAF'},
+    {name:'Ghana',flag:'🇬🇭',conf:'CAF'},
+    {name:'Haiti',flag:'🇭🇹',conf:'CONCACAF'},
+    {name:'IR Iran',flag:'🇮🇷',conf:'AFC'},
+    {name:'Iraq',flag:'🇮🇶',conf:'AFC'},
+    {name:'Jordan',flag:'🇯🇴',conf:'AFC'},
+    {name:'New Zealand',flag:'🇳🇿',conf:'OFC'},
     {name:'Panama',flag:'🇵🇦',conf:'CONCACAF'},
     {name:'Paraguay',flag:'🇵🇾',conf:'CONMEBOL'},
-    {name:'Bolivia',flag:'🇧🇴',conf:'CONMEBOL'},
-    {name:'Venezuela',flag:'🇻🇪',conf:'CONMEBOL'},
-    {name:'Peru',flag:'🇵🇪',conf:'CONMEBOL'},
-    {name:'New Zealand',flag:'🇳🇿',conf:'OFC'},
     {name:'Qatar',flag:'🇶🇦',conf:'AFC'},
-    {name:'Iraq',flag:'🇮🇶',conf:'AFC'},
+    {name:'Saudi Arabia',flag:'🇸🇦',conf:'AFC'},
+    {name:'Scotland',flag:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',conf:'UEFA'},
     {name:'South Africa',flag:'🇿🇦',conf:'CAF'},
-    {name:'Jamaica',flag:'🇯🇲',conf:'CONCACAF'},
-    {name:'Australia',flag:'🇦🇺',conf:'AFC'},
+    {name:'Tunisia',flag:'🇹🇳',conf:'CAF'},
+    {name:'Uzbekistan',flag:'🇺🇿',conf:'AFC'},
   ]
 };
 
 // Group stage fixtures — 2026 WC (12 groups × 6 matches = 72 matches)
 // Simplified representative schedule; dates approximate
 const GROUPS = {
-  'A': ['USA','Bolivia','Panama','Serbia'],
-  'B': ['Morocco','Spain','Portugal','Egypt'],
-  'C': ['Argentina','Jamaica','Ecuador','Poland'],
-  'D': ['France','Ivory Coast','Tunisia','Mexico'],
-  'E': ['Germany','Switzerland','Belgium','Senegal'],
-  'F': ['Brazil','Algeria','Venezuela','Denmark'],
-  'G': ['England','South Africa','Australia','Netherlands'],
-  'H': ['Croatia','Colombia','Paraguay','Uruguay'],
-  'I': ['Japan','Turkey','Iran','South Korea'],
-  'J': ['Canada','Costa Rica','Peru','Austria'],
-  'K': ['Cameroon','Qatar','Ghana','Honduras'],
-  'L': ['Nigeria','Saudi Arabia','Iraq','New Zealand'],
+  'A': ['Czechia','Korea Republic','Mexico','South Africa'],
+  'B': ['Bosnia and Herzegovina','Canada','Qatar','Switzerland'],
+  'C': ['Brazil','Haiti','Morocco','Scotland'],
+  'D': ['Australia','Paraguay','Türkiye','USA'],
+  'E': ["Côte d'Ivoire",'Curaçao','Ecuador','Germany'],
+  'F': ['Japan','Netherlands','Sweden','Tunisia'],
+  'G': ['Belgium','Egypt','IR Iran','New Zealand'],
+  'H': ['Cabo Verde','Saudi Arabia','Spain','Uruguay'],
+  'I': ['France','Iraq','Norway','Senegal'],
+  'J': ['Algeria','Argentina','Austria','Jordan'],
+  'K': ['Colombia','Congo DR','Portugal','Uzbekistan'],
+  'L': ['Croatia','England','Ghana','Panama'],
 };
 
 // Generate round-robin fixtures per group
@@ -493,10 +493,8 @@ function genGroupFixtures(group, teams, baseDate, matchNum) {
 let ALL_FIXTURES = [];
 
 function initFixtures() {
-  if (getState('fixtures_init')) {
-    ALL_FIXTURES = getState('fixtures') || [];
-    return;
-  }
+  // Always regenerate — teams/groups may have changed
+  saveState('fixtures_init', false);
   ALL_FIXTURES = [];
   const startDate = new Date('2026-06-11');
   let d = new Date(startDate);
